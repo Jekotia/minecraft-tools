@@ -1,0 +1,51 @@
+#! /bin/bash
+
+target=pwd
+bt=~/minecraft/buildtools
+temp=~/temp
+
+function update () {
+	mkdir -p $bt
+	if [ -e $bt/BuildTools.jar ] ; then
+		rm -f $bt/BuildTools.jar
+	fi
+	curl "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar" -o $bt/BuildTools.jar
+}
+
+function build () {
+	mkdir -p $temp
+	cd $temp
+	if [ "$rev" == "" ] ; then
+		java -jar $bt/BuildTools.jar
+	else
+		java -jar $bt/BuildTools.jar --rev $rev
+	fi
+}
+
+case $1 in
+	update)
+		update
+	;;
+	build|bukkit|craftbukkit|spigot)
+		rev="$2"
+		update
+		build
+
+		if [ "$1" == "bukkit" || "$1" == "craftbukkit" ] ; then
+			server="craftbukkit"
+			mv $temp/$server*.jar $target
+			rm -rf $temp
+		elif [ "$1" == "spigot" ] ; then
+			server="spigot"
+			mv $temp/$server*.jar $target
+			rm -rf $temp
+		fi
+
+	;;
+	*)
+		echo "$0 usage: $0 update"
+		echo "$0 usage: $0 { bukkit | craftbukkit | spigot }"
+		echo "$0 usage: $0 { bukkit | craftbukkit | spigot } rev#"
+		echo "e.g. $0 bukkit 1.12.2"
+	;;
+esac
