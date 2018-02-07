@@ -1,6 +1,6 @@
 #! /bin/bash
 
-target=pwd
+target=`pwd`
 bt=~/minecraft/buildtools
 temp=~/temp
 
@@ -26,26 +26,18 @@ case $1 in
 	update)
 		update
 	;;
-	build|bukkit|craftbukkit|spigot)
+	build)
 		rev="$2"
 		update
 		build
 
-		if [ "$1" == "bukkit" || "$1" == "craftbukkit" ] ; then
-			server="craftbukkit"
-			mv $temp/$server*.jar $target
-			rm -rf $temp
-		elif [ "$1" == "spigot" ] ; then
-			server="spigot"
-			mv $temp/$server*.jar $target
-			rm -rf $temp
-		fi
-
+		mv $temp/*.jar $target
+		rm -rf $temp
 	;;
 	*)
 		echo "$0 usage: $0 update"
-		echo "$0 usage: $0 { bukkit | craftbukkit | spigot }"
-		echo "$0 usage: $0 { bukkit | craftbukkit | spigot } rev#"
-		echo "e.g. $0 bukkit 1.12.2"
+		echo "$0 usage: $0 build"
+		echo "$0 usage: $0 build rev#"
+		echo "e.g. $0 build 1.12.2"
 	;;
 esac
